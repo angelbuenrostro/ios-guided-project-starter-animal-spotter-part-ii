@@ -31,6 +31,27 @@ class AnimalDetailViewController: UIViewController {
     }
     
     func getDetails() {
+        guard let apiController = apiController,
+            let animalName = animalName else { return }
+        apiController.fetchDetails(for: animalName) { (result) in
+            if let animal = try? result.get() {
+                DispatchQueue.main.async {
+                    self.updateViews(with: animal)
+                }
+                //fetch image for animal
+            }
+        }
+    }
+    
+    func updateViews(with animal: Animal) {
+        title = animal.name
+        descriptionLabel.text = animal.description
+        coordinatesLabel.text = "lat: \(animal.latitude), long: \(animal.longitude)"
         
+        // Convert date to a string format
+        let df = DateFormatter()
+        df.dateStyle = .short
+        df.timeStyle = .short
+        timeSeenLabel.text = df.string(from: animal.timeSeen)
     }
 }

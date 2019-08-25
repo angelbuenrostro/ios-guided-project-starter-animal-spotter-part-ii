@@ -144,7 +144,7 @@ class APIController {
         }.resume()
     }
     
-    // create function to fetch image
+    // create function to fetch details
     func fetchDetails(for animalName: String, completion: @escaping (Result<Animal, NetworkError>) -> Void) {
         guard let bearer = bearer else {
             completion(.failure(.noAuth))
@@ -182,6 +182,29 @@ class APIController {
                 completion(.failure(.noDecode))
                 return
             }
+        }.resume()
+    }
+    
+    // create function to fetch image
+    func fetchImage(at urlString: String, completion: @escaping (Result<UIImage, NetworkError>) -> Void) {
+        let imageUrl = URL(string: urlString)!
+        
+        var request = URLRequest(url: imageUrl)
+        request.httpMethod = HTTPMethod.get.rawValue
+        
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            if let _ = error {
+                completion(.failure(.otherError))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(.badData))
+                return
+            }
+            
+            let image = UIImage(data: data)!
+            completion(.success(image))
         }.resume()
     }
 }
